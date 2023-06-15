@@ -10,6 +10,7 @@ namespace BehaviorTree
 
         public override NodeState Evaluate()
         {
+            child.Evaluate();
             state = NodeState.RUNNING;
             return state;
         }

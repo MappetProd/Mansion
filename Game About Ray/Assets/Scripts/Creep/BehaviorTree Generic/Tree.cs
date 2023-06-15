@@ -14,14 +14,14 @@ namespace BehaviorTree
 
         private bool _isStartedBehavior;
 
-        void Start()
+        protected void Start()
         {
             data = new Dictionary<string, object>();
             _isStartedBehavior = false;
             _root = SetupTree();
         }
 
-        void Update()
+        protected void Update()
         {
             if (!_isStartedBehavior)
             {

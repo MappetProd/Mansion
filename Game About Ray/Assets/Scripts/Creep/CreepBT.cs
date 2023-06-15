@@ -6,7 +6,7 @@ using UnityEngine;
 public class CreepBT : BTree
 {
     public Transform[] waypoints;
-
+    public float timeForOccurance = 3f;
 
     protected override Node SetupTree()
     {

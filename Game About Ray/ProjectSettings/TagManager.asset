@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Canvas
   - Puzzle
+  - Room
+  - PowerEntrance
+  - PatrolPoint
   layers:
   - Default
   - TransparentFX
