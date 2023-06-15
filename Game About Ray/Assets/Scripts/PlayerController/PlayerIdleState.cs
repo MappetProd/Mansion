@@ -7,16 +7,13 @@ public class PlayerIdleState : PlayerGroundedState
     private float _horizontalInput;
     private float _verticalInput;
 
-    private PlayerSM _sm;
-
-    public PlayerIdleState(string name, StateMachine stateMachine) : base(name, stateMachine) 
-    { 
-        _sm = (PlayerSM)stateMachine;
-    }
+    public PlayerIdleState(string name, StateMachine stateMachine) : base(name, stateMachine) { }
 
     public override void OnEnter()
     {
         base.OnEnter();
+        _horizontalInput = 0f;
+        _verticalInput = 0f;
         _sm.rb.velocity = Vector2.zero;
     }
 

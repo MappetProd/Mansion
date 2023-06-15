@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlayerSM : StateMachine
 {
     #region PLAYER_COMPONENTS
-    [HideInInspector]
-    public Rigidbody2D rb;
+    [HideInInspector] public Rigidbody2D rb;
+    [HideInInspector] public Animator animator;
     public InventoryManager inventoryManager;
     #endregion
 
@@ -29,6 +29,7 @@ public class PlayerSM : StateMachine
         idleState = new PlayerIdleState("player_idle", this);
         walkingState = new PlayerWalkingState("player_walking", this);
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
     protected override BaseState GetInitialState()
     {
