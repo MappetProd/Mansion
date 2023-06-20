@@ -6,19 +6,22 @@ using System.Linq;
 using UnityEngine.AI;
 using System;
 using System.Reflection;
+using JetBrains.Annotations;
 
 public class TaskPatrol : Node
 {
-    private List<Transform> tempWaypoints;
     private CreepBT _tree;
     private GameObject[] _rooms;
     private GameObject _chosenRoom;
     private IEnumerable<Transform> _powerEntrances;
     private List<Transform> _powerEntrancesList;
     private IEnumerable<Transform> _patrolPoints;
+    private List<Transform> _patrolPointsList;
     private NavMeshAgent _agent;
     private int _currWaypointIndex;
     private Transform _currWaypoint;
+
+
     public TaskPatrol(BTree tree) : base(tree) {
         _tree = (CreepBT)tree;
 
@@ -32,12 +35,14 @@ public class TaskPatrol : Node
     {
         if (state != NodeState.RUNNING)
         {
+            _tree.gameObject.SetActive(true);
             _rooms = GameObject.FindGameObjectsWithTag("Room"); // get all rooms in the game-world
-            ChooseRoom(); // choose room randomly
+            _chosenRoom = _rooms[UnityEngine.Random.Range(0, _rooms.Length)]; // choose room randomly
+
             ChoosePowerEntrance(); //choose power entrance of the chosen room
             InitWaypoints(); //get all patrol waypoints of the chosen room
 
-            _tree.gameObject.transform.position = ((Transform)_powerEntrancesList.First()).position; //teleport creep to the entrance
+            _tree.gameObject.transform.position = _powerEntrancesList.First().position; //teleport creep to the entrance
             _currWaypointIndex = 0;
         }
 
@@ -47,36 +52,34 @@ public class TaskPatrol : Node
             _agent.SetDestination(_currWaypoint.position);
             state = NodeState.RUNNING;
         }
-        catch (IndexOutOfRangeException)
+        catch (ArgumentOutOfRangeException)
         {
             state = NodeState.SUCCESS;
+            _currWaypointIndex = 0;
+            _currWaypoint = null;
+            _agent.SetDestination(_powerEntrancesList[0].position);
+            _tree.gameObject.SetActive(false);
         }
-
         return state;
     }
 
     private void InitWaypoints()
     {
-        _patrolPoints = _chosenRoom.GetComponentsInChildren<Transform>().Where(x => x.CompareTag("PatrolPoint"));
+        _patrolPoints = _chosenRoom.GetComponentsInChildren<Transform>();
+        _patrolPointsList = new List<Transform>();
 
-        IEnumerator temp = _patrolPoints.GetEnumerator();
-        int amountOfPatrolPoints = 0;
-        foreach (Transform t in _patrolPoints)
+        foreach(Transform waypoint in _patrolPoints)
         {
-            amountOfPatrolPoints++;
+            if (waypoint.gameObject.tag == "PatrolPoint")
+                _patrolPointsList.Add(waypoint);
         }
     }
 
     private void ChoosePatrolPoint(int index) 
     {
-        Transform[] temp = _patrolPoints.ToArray();
-        int rand = UnityEngine.Random.Range(1, 3);
-        _currWaypoint = temp[index + rand];
-    }
-
-    private void ChooseRoom()
-    {
-        _chosenRoom = _rooms[UnityEngine.Random.Range(0, _rooms.Length)];
+        int randomIndex = UnityEngine.Random.Range(1, _patrolPointsList.Count - 1);
+        _currWaypoint = _patrolPointsList[randomIndex];
+        _patrolPointsList.RemoveAt(randomIndex);
     }
 
     private void ChoosePowerEntrance()
@@ -85,17 +88,10 @@ public class TaskPatrol : Node
 
         _powerEntrancesList = new List<Transform>();
 
-        foreach (var elem in _powerEntrances)
+        foreach (var waypoint in _powerEntrances)
         {
-            if (elem.tag == "PowerEntrance")
-            {
-                _powerEntrancesList.Add(elem);
-            }
+            if (waypoint.gameObject.tag == "PowerEntrance")
+                _powerEntrancesList.Add(waypoint);
         }
-    }
-
-    private void TagWaypoint()
-    {
-        
     }
 }

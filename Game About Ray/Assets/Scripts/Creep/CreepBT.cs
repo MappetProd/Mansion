@@ -7,15 +7,18 @@ public class CreepBT : BTree
 {
     public Transform[] waypoints;
     public float timeForOccurance = 3f;
+    public UIManager uiManager;
 
     protected override Node SetupTree()
     {
-        Node root = new Repeater(this, 
-                        new Sequence(this, new List<Node> { 
-                            new Invertor(this, 
-                                new RepeatTillFail(this, 
+        Node root = new Repeater(this,
+                        new Sequence(this, new List<Node> {
+                            new Invertor(this,
+                                new RepeatTillFail(this,
                                     new CheckIfTimerOut(this))),
-                            new TaskPatrol(this)})
+                            new TaskPatrol(this),
+                            }
+                        )   
                     );
         return root;
     }
